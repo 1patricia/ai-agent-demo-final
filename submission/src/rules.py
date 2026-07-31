@@ -1,8 +1,19 @@
-# 【规则引擎：敏感词、提示注入拦截】
+# 【规则引擎：敏感词、提示注入拦截 —— 检测 + 脱敏，不终止流程】
+import re
 from logger import logger
 
-# 敏感属性黑名单（禁止AI分析的维度）
+# 敏感属性黑名单（检测但不阻断 LLM 分析）
 SENSITIVE_KEYWORDS = ["年龄", "性别", "婚育", "婚姻", "籍贯", "怀孕"]
+
+# 敏感词 → 脱敏占位，保留语义但不暴露具体值
+SENSITIVE_PATTERNS = [
+    (r"\d{1,3}\s*岁", "[已脱敏-年龄]"),
+    (r"男[性|士|候选人]?", "[已脱敏-性别]"),
+    (r"女[性|士|候选人]?", "[已脱敏-性别]"),
+    (r"已婚|未婚|离异", "[已脱敏-婚育]"),
+    (r"籍贯[\s：:]*\S+", "[已脱敏-籍贯]"),
+    (r"怀孕|备孕|产假", "[已脱敏-婚育]"),
+]
 
 # 简单提示词注入检测
 def check_prompt_injection(text: str) -> tuple[bool, str]:
@@ -22,14 +33,28 @@ def check_sensitive_content(text: str) -> tuple[bool, str]:
     return False, ""
 
 def pre_filter(input_text: str) -> dict:
+    """
+    前置过滤：检测 + 脱敏，不阻断流程。
+    返回 {'pass': True, 'risk_flags': [...], 'desensitized_text': str}
+    """
     risk_flags = []
+    desensitized = input_text
+
+    # 1. 提示词注入检测
     inj_flag, inj_msg = check_prompt_injection(input_text)
-    sen_flag, sen_msg = check_sensitive_content(input_text)
     if inj_flag:
         risk_flags.append(inj_msg)
+
+    # 2. 敏感属性检测 + 脱敏
+    sen_flag, sen_msg = check_sensitive_content(input_text)
     if sen_flag:
         risk_flags.append(sen_msg)
+        # 脱敏：具体值替换为占位，保留上下文结构供 LLM 分析
+        for pattern, replacement in SENSITIVE_PATTERNS:
+            desensitized = re.sub(pattern, replacement, desensitized)
+
     return {
-        "pass": len(risk_flags) == 0,
-        "risk_flags": risk_flags
+        "pass": True,  # 始终放行，不中断 LLM 分析
+        "risk_flags": risk_flags,
+        "desensitized_text": desensitized,
     }
