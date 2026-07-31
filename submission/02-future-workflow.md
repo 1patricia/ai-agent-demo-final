@@ -49,10 +49,10 @@ flowchart TD
     WRITE --> END([候选人档案归档])
     END --> LEARN[5. 经验沉淀与规则迭代]
     
-    style BLOCK fill:#ffcccc
-    style TAKEOVER fill:#ffe6cc
-    style ESCALATE fill:#ffe6cc
-    style CHECK fill:#e6f3ff
+    style BLOCK fill:#ffcccc,color:#000000
+    style TAKEOVER fill:#ffe6cc,color:#000000
+    style ESCALATE fill:#ffe6cc,color:#000000
+    style CHECK fill:#e6f3ff,color:#000000
 ```
 
 ---
@@ -107,18 +107,73 @@ Agent 基于统一岗位标准，对归集材料执行四层处理，**所有输
 人工审核后的最终产物，统一回写至候选人专属档案：
 ```json
 {
-  "candidate_id": "C-017",
-  "position": "业务侧 AI Builder",
-  "evidence_report_version": "v1.0",
-  "ai_generated_at": "2026-07-30T14:00:00Z",
-  "human_reviewed_by": "HR-001",
-  "final_status": "待补充面试",
-  "evidence_by_criterion": [...],
-  "evidence_gaps": [...],
-  "recommended_questions": [...],
-  "risk_flags": [...],
-  "human_modifications": ["调整了 S2 证据权重", "补充了面试官乙的原始记录"],
-  "audit_trail": ["AI-v1.0", "human-edit-v1.1"]
+  "candidate_id": "TC-001",
+  "evidence_by_criterion": [
+    {
+      "criterion": "S1 业务场景诊断",
+      "supporting_evidence": [
+        "通过客户会话数据定位需求痛点，梳理完整改造流程"
+      ],
+      "counter_evidence": [],
+      "evidence_source": "【面试官甲】通过客户会话数据定位需求痛点，梳理完整改造流程",
+      "confidence": "high"
+    },
+    {
+      "criterion": "S2 AI工程打样",
+      "supporting_evidence": [
+        "独立开发客服RAG系统，开源代码，搭建人工复核流程"
+      ],
+      "counter_evidence": [],
+      "evidence_source": "【简历】独立开发客服RAG系统，开源代码，搭建人工复核流程；项目仅内部演示未上线。",
+      "confidence": "high"
+    },
+    {
+      "criterion": "S3 人机协同与风险意识",
+      "supporting_evidence": [
+        "搭建人工复核流程"
+      ],
+      "counter_evidence": [
+        "推动业务分阶段落地，但未设计线上故障回滚方案"
+      ],
+      "evidence_source": "【简历】搭建人工复核流程；【面试官乙】推动业务分阶段落地，但未设计线上故障回滚方案。",
+      "confidence": "medium"
+    },
+    {
+      "criterion": "S4 业务共创与推进",
+      "supporting_evidence": [
+        "推动业务分阶段落地"
+      ],
+      "counter_evidence": [],
+      "evidence_source": "【面试官乙】推动业务分阶段落地，但未设计线上故障回滚方案。",
+      "confidence": "high"
+    },
+    {
+      "criterion": "S5 复盘交付与知识沉淀",
+      "supporting_evidence": [
+        "开源代码"
+      ],
+      "counter_evidence": [],
+      "evidence_source": "【简历】独立开发客服RAG系统，开源代码",
+      "confidence": "medium"
+    }
+  ],
+  "unverified_claims": [],
+  "evidence_gaps": [
+    "S1：缺乏具体业务场景诊断案例的深入细节",
+    "S2：项目未上线，缺乏线上评测、错误处理、权限与安全等证据",
+    "S3：仅有基本人工复核，未展示根据风险、置信度等设计人机分工的精细考量；缺少线上故障回滚设计",
+    "S4：仅有分阶段推动的描述，缺乏与业务共同设计工作流的实例",
+    "S5：缺少将能力交接给业务侧人员、赋能AI Builder的明确证据"
+  ],
+  "recommended_interview_questions": [
+    "请举一个具体例子，说明你如何从客户会话数据中发现真实痛点，并推动业务改造？",
+    "你的RAG系统未上线，如果在线上遇到幻觉或错误回答，你会如何设计监控和回滚机制？",
+    "在设计人机协同时，你如何判断哪些环节必须由人工处理？依据是什么？",
+    "在与业务团队合作时，你如何说服他们接受AI改造工作流？遇到过什么阻力？",
+    "你是否有将AI样板能力交付给业务人员或内部Builder的经验？如何进行知识转移和复用？"
+  ],
+  "risk_flags": [],
+  "human_decision_required": true
 }
 ```
 

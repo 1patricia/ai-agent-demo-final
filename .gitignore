@@ -1,0 +1,32 @@
+# Python 虚拟环境
+venv/
+env/
+.venv/
+
+# Python 编译缓存
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 测试相关缓存
+.pytest_cache/
+.coverage
+
+# 日志、临时评测输出文件
+*.log
+evaluation/*.tmp
+evaluation/runtime_results.json
+
+# IDE 配置文件夹
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 系统垃圾文件
+.DS_Store
+Thumbs.db
+
+# Ollama 本地大模型缓存
+.ollama/
